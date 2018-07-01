@@ -1,6 +1,6 @@
 #ifndef PID_H
 #define PID_H
-
+#include <math.h>
 class PID {
 public:
   /*
@@ -18,6 +18,24 @@ public:
   double Kd;
 
   /*
+  * Coefficients
+  */ 
+  double Dp;
+  double Di;
+  double Dd;
+
+  double err; 
+  double best_err;
+  bool is_twiddle_plus;
+  
+  double* K_array[3];
+  int K_index =0;
+  double* D_array[3];
+  int update_count =0;
+  int twiddle_count = 300;
+  
+  /*
+
   * Constructor
   */
   PID();
@@ -41,6 +59,11 @@ public:
   * Calculate the total PID error.
   */
   double TotalError();
+
+  /*
+  * Twiddle for calculate best P I D params.
+  */
+  void twiddle(double tol);
 };
 
 #endif /* PID_H */
