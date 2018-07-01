@@ -2,6 +2,32 @@
 Self-Driving Car Engineer Nanodegree Program
 
 ---
+## PID Control 
+In this project,PID is focus on reduce CTE which is cross-track error.The main control output is the steering angle.In the following discussion, mainly for the bicycle model, the output is considered to be the steering angle.
+### P-Proportional
+
+Represents the reverse steering angle, which is used to bring the system closer to expectations, ie to reduce cte. The output is p * cte . But just using the p parameter results in the model continuing to oscillate in the x-axis. The p control considers the current error.
+p代表反向的转向角度，用来使系统接近预期，即减少cte。输出结果为 p * cte 。但是只是用p参数的结果是模型将会持续在x轴震荡。p控制考虑当前误差。
+### I- Intergral
+Consider the error in the past, add the error of a certain period of time to the system in a certain proportion. But when there are too many i parameters, there will be overshoot.
+
+考虑过去误差，将一段时间的误差以一定比例加入到系统中。但是当i参数过多时，会出现过冲的现象。
+### D-derivative
+The difference between this cte and the last cte is added to the system through a certain percentage. Consider future errors. The larger the value, the faster the system will reflect on the output. It can improve the setting time and system stability.
+将本次cte和上次cte的差值通过一定比例加入系统。考虑将来的误差。该值越大，系统对输出结果反映越迅速。可以提升整定时间和系统稳定性。
+
+## PID Hyperparameter Selcection
+### twiddle
+my first ideas is blow(in pid.cpp line 69 - 126):
+1. I chose a ramdom value which P I D equal [0.5,0.5,0.0005]
+2. I achieved a twiddle in PID class and let it output the result and CTE(the detail in PID::twiddle() line 59)
+3. I start run the car ,and before the car away from the road,I select the PID when the cte is best
+4. I input the new pid param into the param, and repeat the 2 ,3 ,4 step until the car could always run in the road smoothly.
+but in the real implementation,I found that, when I use the twiddle ,the car is easily out of the road. so I changed the idea,and manually tuning the hyperparameters.
+### manual tuning
+1.我首先调节P 参数 设置 i和d参数为0.
+2. 增加d参数 到震荡消退。
+3. 观察车驶出道路的原因，如果是因为反应过慢 增加kp 和kd ki 如果是因为震荡(过冲) 减少 kp 和 ki 
 
 ## Dependencies
 
@@ -37,20 +63,3 @@ There's an experimental patch for windows in this [PR](https://github.com/udacit
 
 Tips for setting up your environment can be found [here](https://classroom.udacity.com/nanodegrees/nd013/parts/40f38239-66b6-46ec-ae68-03afd8a601c8/modules/0949fca6-b379-42af-a919-ee50aa304e6a/lessons/f758c44c-5e40-4e01-93b5-1a82aa4e044f/concepts/23d376c7-0195-4276-bdf0-e02f1f3c665d)
 
-## PID Param Selcection
-1. I chose a ramdom value which P I D equal [0.5,0.5,0.0005]
-2. I achieved a twiddle in PID class and let it output the result and CTE(the detail in PID::twiddle() line 59)
-3. I start run the car ,and before the car away from the road,I select the PID when the cte is best
-4. I input the new pid param into the param, and repeat the 2 ,3 ,4 step until the car could always run in the road smoothly.
-### for real 
- in my statuion:
-+ I set P I D equal 0,0,0;
-+ the first time I got PID is 0.11 0.11 0.0 and the best_err is 0.400429. 
-+ and the system is failed so I set PID 0.11 0 0
-+ I got PID is 0.231 0 0 
-+ when the i is 0.11 the car run out of road so I set 0.231 0.0
-+ I got PID is 0.3641 0.11 0 a but this time when the i is 0.11 the car run out agin so I set the Di to 0.01
-+ I releaed the i is too big so I decreased the Di to 0.001 and all set to zero
-+ this time I set PID is 0.231 0.00131 0
-
-## chinese
